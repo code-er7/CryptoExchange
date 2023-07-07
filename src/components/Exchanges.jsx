@@ -4,27 +4,34 @@ import { server } from '..'
 import { Container, HStack } from '@chakra-ui/react';
 import Loder from './Loder';
 import ExchangeCard from './ExchangeCard';
+import ErrorComponent from './ErrorComponent';
 
 const Exchanges = () => {
   const [exchanges , setExchanges]= useState([]);
   const [loading , setLoading]= useState(true);
+  const [error , setError]= useState(false);
   useEffect(() => {
      const fetchExchanges = async()=>{
-      const {data}=await axios.get(`${server}/exchanges`)
-      console.log(data);
-      setLoading(false);
-      setExchanges(data);
+        try {
+          const {data}=await axios.get(`${server}/exchanges`)
+          console.log(data);
+          setLoading(false);
+          setExchanges(data);
+        } catch (error) {
+            setLoading(false);
+            setError(true);
+        }
      }
      fetchExchanges();
   }, [])
-
+  if(error)return <ErrorComponent error = {"Error while fetching exchanges"}/>
   return (
     <Container maxW={"container.xl"} >
   
 
     {loading? (<Loder />): (
       <>  
-      <HStack wrap={"wrap"}>
+      <HStack wrap={"wrap"} justifyContent={"space-evenly"}>
           {
             exchanges.map((i)=>{
              return (
